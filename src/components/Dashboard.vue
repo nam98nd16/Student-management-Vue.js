@@ -3,9 +3,9 @@
         <section>
             <div class="col1">
                 <div class="class">
-                    <h5>Current Admin: {{ userProfile.name }}</h5>
-                    <p>Admin description: {{ userProfile.title }}</p>
-                    <a @click="viewAllStudents">View list of all students</a>
+                    <h5>Current User: {{ userProfile.username }}</h5>
+                    <h5>Role: {{ userProfile.role }}</h5>
+                    <a @click="viewAllStudentsWithAPI">View list of all students</a>
                     <br><br><br><br><br><br><br>
                     <div class="create-class">
                         <p>Create a new class</p>
@@ -78,8 +78,8 @@
                     </div>
                     <div v-show="allStudents.length" class="comments">
                         <div v-for="student in allStudents" :key="student.id" class="comment">
-                            <p>Name: {{ student.name }}</p>
-                            <p>Student ID: {{ student.sid }}</p>
+                            <p>Name: {{ student.username }}</p>
+                            <p>Student ID: {{ student._id }}</p>
                         </div>
                     </div>
                 </div>
@@ -89,6 +89,10 @@
 </template>
 
 <script>
+    import axios from 'axios'
+    const api = axios.create({
+        baseURL: 'http://localhost:3000'
+    })
     import moment from 'moment'
     import { mapState } from 'vuex'
     import { log } from 'util';
@@ -239,6 +243,14 @@
                     }
                 }).catch(function(err) {
                     console.log("Error getting document: ", error);
+                })
+            },
+            viewAllStudentsWithAPI () {
+                api.get('/users', { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.allStudents = response.data
+                    this.showAllStudentsModal = true
+                }).catch(error => {
+                    console.log(error)
                 })
             }
         },

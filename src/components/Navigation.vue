@@ -6,7 +6,7 @@
                 <ul class="inline">
                     <li><router-link to="dashboard">Dashboard</router-link></li>
                     <li><router-link to="settings">Settings</router-link></li>
-                    <li><a @click="logout">logout</a></li>
+                    <li><a @click="logoutUsingAPI">logout</a></li>
                 </ul>
             </div>
         </section>
@@ -14,6 +14,10 @@
 </template>
 
 <script>
+import axios from 'axios'
+const api = axios.create({
+    baseURL: 'http://localhost:3000'
+})
 import { Script } from 'vm';
 const fb = require('../firebaseConfig.js')
     export default {
@@ -24,6 +28,13 @@ const fb = require('../firebaseConfig.js')
                     this.$router.push('/login')
                 }).catch(err => {
                     console.log(err)
+                })
+            },
+            logoutUsingAPI () {
+                api.get('logout', { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(res => {
+                    this.$store.dispatch('clearData')
+                    this.$router.push('/login')
+                    this.$cookie.delete('token')
                 })
             }
         }

@@ -7,6 +7,7 @@ import Dashboard from '@/components/Dashboard'
 import Settings from '@/components/Settings'
 import TestApi from '../services/TestApi'
 import Test from '@/components/Test'
+import AuthApi from '../services/AuthApi'
 
 Vue.use(Router)
 
@@ -48,11 +49,11 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth)
-  const currentUser = firebase.auth().currentUser
+  const currentToken = Vue.cookie.get('token')
 
-  if (requiresAuth && !currentUser) {
+  if (requiresAuth && !currentToken) {
       next('/login')
-  } else if (requiresAuth && currentUser) {
+  } else if (requiresAuth && currentToken) {
       next()
   } else {
       next()

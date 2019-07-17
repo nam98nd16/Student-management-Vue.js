@@ -13,13 +13,13 @@
                 <form v-if="showLoginForm" @submit.prevent>
                     <h1>Welcome Back</h1>
 
-                    <label for="username1">Email</label>
-                    <input v-model.trim="loginForm.email" type="text" placeholder="Enter username" id="username1" />
+                    <label for="username1">Username</label>
+                    <input v-model.trim="loginAPIForm.username" type="text" placeholder="Enter username" id="username1" />
 
                     <label for="password1">Password</label>
-                    <input v-model.trim="loginForm.password" type="password" placeholder="******" id="password1" />
+                    <input v-model.trim="loginAPIForm.password" type="password" placeholder="******" id="password1" />
 
-                    <button @click="login" class="button">Log In</button>
+                    <button @click="loginWithAPI(loginAPIForm.username, loginAPIForm.password)" class="button">Log In</button>
 
                     <div class="extras">
                         <a @click="toggleForm">Create an Account</a>
@@ -28,19 +28,19 @@
                 <form v-if='!showLoginForm' @submit.prevent>
                     <h1>Get Started</h1>
 
-                    <label for="name2">Email</label>
-                    <input v-model.trim="signupForm.email" type="text" placeholder="Enter name" id="name2" />
+                    <!--<label for="name2">name</label>
+                    <input v-model.trim="signupAPIForm.name" type="text" placeholder="Enter name" id="name2" />-->
 
                     <label for="username">username</label>
-                    <input v-model.trim="signupForm.name" type="text" placeholder="Enter username" id="username" />
+                    <input v-model.trim="signupAPIForm.username" type="text" placeholder="Enter username" id="username" />
 
                     <label for="password">password</label>
-                    <input v-model.trim="signupForm.password" type="password" placeholder="Enter password" id="password" />
+                    <input v-model.trim="signupAPIForm.password" type="password" placeholder="Enter password" id="password" />
 
-                    <label for="title">Title</label>
-                    <input v-model.trim="signupForm.title" type="text" placeholder="Company" id="title" />
+                    <!--<label for="title">Title</label>
+                    <input v-model.trim="signupForm.title" type="text" placeholder="Company" id="title" />-->
 
-                    <button @click="signup" type="submit" class="button">Sign Up</button>
+                    <button @click="signupWithAPI(signupAPIForm.username, signupAPIForm.password)" type="submit" class="button">Sign Up</button>
 
                     <div class="extras">
                         <a @click="toggleForm">Back to Log In</a>
@@ -59,6 +59,10 @@
 
 <script>
 import AuthApi from '@/services/AuthApi'
+import axios from 'axios'
+const api = axios.create({
+    baseURL: 'http://localhost:3000'
+})
 const fb = require('../firebaseConfig.js')
     export default {
         data() {
@@ -129,21 +133,47 @@ const fb = require('../firebaseConfig.js')
                     this.errorMsg = err.message
                 })
             },
-            async signupWithAPI () {
-                this.performingRequest = true
-                AuthApi.signupUsingAPI(this.signupAPIForm.name, this.signupAPIForm.username, this.signupAPIForm.password)
-                this.performingRequest = false
-            },
-            async loginWithAPI () {
+            async signupWithAPI (username, password) {
                 //this.performingRequest = true
-                const response = await AuthApi.loginUsingAPI(this.loginAPIForm.username, this.loginAPIForm.password)
-                if (response.data.username) {
-                    this.$store.commit('setCurrentUser', response.data)
-                    this.$store.dispatch('fetchUserProfile')
-                    this.performingRequest = false
-                    this.$router.push('/test')
-                }
-                this.performingRequest = false
+                //const response = await AuthApi.signupUsingAPI(this.signupAPIForm.username, this.signupAPIForm.password)
+                //if (response.data.message == 'Successfully signed up!') {
+                  //  //this.performingRequest = false
+                  //  this.toggleForm()
+               // }
+                //this.performingRequest = false
+
+                api.post('register', {username, password}).then(response => {
+                    if (response.data.message == 'Successfully signed up!') {
+
+                        this.toggleForm()
+                    }
+                }).catch(error => {
+                    this.errorMsg = error.response.data.error
+                })
+            },
+            async loginWithAPI (username, password) {
+                //this.performingRequest = true
+                //const response = await AuthApi.loginUsingAPI(this.loginAPIForm.username, this.loginAPIForm.password)
+               // if (response.data.user) {
+                 //   this.$cookie.set('token', response.data.token)
+                 //   this.$store.commit('setCurrentUser', response.data.user)
+                 //   this.$store.dispatch('fetchUserProfile')
+                 //   this.performingRequest = false
+                 //   this.$router.push('/dashboard')
+              //  }
+               // this.performingRequest = false
+
+               api.post('login', {username, password}).then(response => {
+                   if (response.data.user) {
+                        this.$cookie.set('token', response.data.token)
+                        this.$store.commit('setCurrentUser', response.data.user)
+                        this.$store.dispatch('fetchUserProfile')
+                        this.performingRequest = false
+                        this.$router.push('/dashboard')
+                   }
+               }).catch(error => {
+                   this.errorMsg = error.response.data
+               })
             }
         }
     }
