@@ -2,32 +2,39 @@
     <section id="settings">
         <div class="col1">
             <h3>Settings</h3>
-            <p>Update your profile</p>
-
+            <p>Username: {{ userProfile.username }}</p>
+            <p>Role: {{ userProfile.role }}</p>
+            <p>Description: {{ userProfile.description }}</p>
             <transition name="fade">
                 <p v-if="showSuccess" class="success">profile updated</p>
             </transition>
 
             <form @submit.prevent>
-                <label for="name">Name</label>
-                <input v-model.trim="name" type="text" :placeholder="userProfile.name" id="name" />
+                <!--<label for="name">Name</label>
+                <input v-model.trim="name" type="text" :placeholder="userProfile.name" id="name" />-->
 
-                <label for="title">Title</label>
-                <input v-model.trim="title" type="text" :placeholder="userProfile.title" id="title" />
+                <label for="description">Update description</label>
+                <input v-model.trim="description" type="text" :placeholder="userProfile.description" id="description" />
 
-                <button @click="updateProfile" class="button">Update Profile</button>
+                <button @click="updateProfileWithAPI(description)" class="button">Update Profile</button>
             </form>
         </div>
     </section>
 </template>
 
 <script>
+    import axios from 'axios'
+    const api = axios.create({
+        baseURL: 'http://localhost:3000'
+    })
     import {mapState} from 'vuex'
+import { error } from 'util';
     export default {
         data () {
             return {
                 name: '',
                 title: '',
+                description: '',
                 showSuccess: false
             }
         },
@@ -49,6 +56,17 @@
                 setTimeout(() => {
                     this.showSuccess = false
                 }, 2000)
+            },
+            updateProfileWithAPI (description) {
+                api.put('/users/' + this.$store.state.userProfile._id, {description}, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.$store.dispatch('fetchUserProfile')
+                    this.showSuccess = true
+                    setTimeout(() => {
+                    this.showSuccess = false
+                }, 2000)
+                }).catch(error => {
+                    console.log(error)
+                })
             }
         }
     }
