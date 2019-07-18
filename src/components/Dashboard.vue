@@ -52,13 +52,13 @@
                         <span>Created on: {{ cla.created }}</span>
                         <ul>
                             <li><a @click="openStudentModal(cla)">Add Student</a></li>
-                            <li><a @click="viewClass(cla)">View Student List</a></li>
+                            <li><a @click="viewAllStudentsInAClassWithAPI(cla._id)">View Student List</a></li>
                         </ul>
                         <br><br><br><br>
                     </div>
                 </div>
                 <div v-else>
-                    <p class="no-results">There are currently no classes</p>
+                    <p class="no-results">Click the above button to view all classes</p>
                 </div>
             </div>
         </section>
@@ -79,19 +79,15 @@
                 <div class="p-container">
                     <a @click="closeClassModal" class="close">X</a>
                     <div class="post">
-                        <a>There are no students in this class</a>
+                        <a v-if="Object.keys(studentsInClass).length > 1">There are {{Object.keys(studentsInClass).length}} students in this class</a>
+                        <a v-else-if="Object.keys(studentsInClass).length == 1">There is only {{Object.keys(studentsInClass).length}} student in this class</a>
+                        <a v-else>No students in this class</a>
                     </div>
-                </div>
-                <div v-show="fullClass.students.length" class="p-container">
-                    <a @click="closeClassModal" class="close">X</a>
-                    <div class="post">
-                        <a v-if="Object.keys(fullClass.students).length > 1">Total: {{Object.keys(fullClass.students).length}} students</a>
-                        <a v-else>Total: {{Object.keys(fullClass.students).length}} student</a>
-                    </div>
-                    <div v-for="student in fullClass.students" :key="student.sid" class="comment">
-                        <p>Name: {{ student.name }}</p>
-                        <p>Class ID: {{ fullClass.id }}</p>
-                        <p>Student ID: {{ student.uid }}</p>
+                    <div v-show="studentsInClass.length" class="comments">
+                        <div v-for="student in studentsInClass" :key="student._id" class="comment">
+
+                            <p>Student ID: {{ student }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -350,6 +346,13 @@
                     //this.fetchAllClassesWithAPI()
                 }).catch(error => {
                     this.notification = error.response.data
+                })
+            },
+            viewAllStudentsInAClassWithAPI (classID) {
+                this.clearNoti()
+                api.get('/classes/' + classID, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.studentsInClass = response.data.students
+                    this.showClassModal = true
                 })
             }
         },
