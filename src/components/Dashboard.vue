@@ -17,7 +17,7 @@
                     <div class="delete-user">
                         <p>Delete a student</p>
                         <form @submit.prevent>
-                            <input v-model.trim="sid_del" type="text" placeholder="Enter student id" id="class1" />
+                            <input v-model.trim="sid_del" type="text" placeholder="Enter student id" id="class2" />
                             <button @click="deleteStudentWithAPI(sid_del)" :disabled="sid_del == ''" class="button">Delete</button>
                         </form>
                     </div>
@@ -25,8 +25,16 @@
                     <div class="create-class">
                         <p>Create a new class</p>
                         <form @submit.prevent>
-                            <input v-model.trim="className" type="text" placeholder="Enter name of the class" id="class1" />
+                            <input v-model.trim="className" type="text" placeholder="Enter name of the class" id="class3" />
                             <button @click="createClassWithAPI(className)" :disabled="className == ''" class="button">Create</button>
+                        </form>
+                    </div>
+                    <br><br><br>
+                    <div class="delete-class">
+                        <p>Delete a class</p>
+                        <form @submit.prevent>
+                            <input v-model.trim="cla_del" type="text" placeholder="Enter name of the class" id="class4" />
+                            <button @click="deleteClassWithAPI(cla_del)" :disabled="cla_del == ''" class="button">Delete</button>
                         </form>
                     </div>
                     <transition name="fade">
@@ -156,7 +164,8 @@
                 notification: '',
                 sid_del: '',
                 allClasses: [],
-                className: ''
+                className: '',
+                cla_del: ''
             }
         },
         computed: {
@@ -330,6 +339,15 @@
                 this.clearNoti()
                 api.post('/classes', {name}, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
                     this.notification = response.data
+                }).catch(error => {
+                    this.notification = error.response.data
+                })
+            },
+            deleteClassWithAPI (name) {
+                this.clearNoti()
+                api.delete('/classes', {data: {name: name}, 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.notification = response.data
+                    //this.fetchAllClassesWithAPI()
                 }).catch(error => {
                     this.notification = error.response.data
                 })
