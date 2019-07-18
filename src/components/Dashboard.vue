@@ -51,7 +51,7 @@
                         <p>Class {{ cla.name }}</p>
                         <span>Created on: {{ cla.created }}</span>
                         <ul>
-                            <li><a @click="openStudentModal(cla)">Add Student</a></li>
+                            <li><a @click="openStudentModal(cla._id)">Add Student</a></li>
                             <li><a @click="viewAllStudentsInAClassWithAPI(cla._id)">View Student List</a></li>
                         </ul>
                         <br><br><br><br>
@@ -68,8 +68,8 @@
                     <a @click="closeStudentModal">X</a>
                     <p>Add a student to the class</p>
                     <form @submit.prevent>
-                        <input v-model.trim="student.sid" type="text" placeholder="Enter the id" />
-                        <button @click="addStudent" :disabled="student.sid == ''" class="button">Add</button>
+                        <input v-model.trim="sid_add" type="text" placeholder="Enter the id" />
+                        <button @click="addStudentToAClassWithAPI(classID,sid_add)" :disabled="sid_add == ''" class="button">Add</button>
                     </form>
                 </div>
             </div>
@@ -134,7 +134,7 @@
     })
     import moment from 'moment'
     import { mapState } from 'vuex'
-    import { log } from 'util';
+    import { log, error } from 'util';
     const fb = require('../firebaseConfig.js')
     import * as firebase from 'firebase';
     export default {
@@ -161,7 +161,9 @@
                 sid_del: '',
                 allClasses: [],
                 className: '',
-                cla_del: ''
+                cla_del: '',
+                classID: '',
+                sid_add: ''
             }
         },
         computed: {
@@ -180,9 +182,9 @@
                     console.log(err)
                 })
             },
-            openStudentModal (cla) {
-                this.student.cid = cla.id
-                this.student.cstudents = cla.countStudent
+            openStudentModal (classID) {
+                this.classID = classID
+                //this.student.cstudents = cla.countStudent
                 this.showStudentModal = true
             },
             closeStudentModal () {
@@ -353,6 +355,14 @@
                 api.get('/classes/' + classID, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
                     this.studentsInClass = response.data.students
                     this.showClassModal = true
+                })
+            },
+            addStudentToAClassWithAPI (classID, userID) {
+                this.clearNoti()
+                api.post('/classes/students', {classID, userID}, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.notification = response.data
+                }).catch(error => {
+                    this.notification = error.response.data
                 })
             }
         },
