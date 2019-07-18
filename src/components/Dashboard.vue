@@ -26,7 +26,7 @@
                         <p>Create a new class</p>
                         <form @submit.prevent>
                             <input v-model.trim="cla.name" type="text" placeholder="Enter name of the class" id="class1" />
-                            <button @click="createClass" :disabled="cla.name == ''" class="button">Create</button>
+                            <button @click="createClassWithAPI(cla.name)" :disabled="cla.name == ''" class="button">Create</button>
                         </form>
                     </div>
                     <transition name="fade">
@@ -37,10 +37,11 @@
                 </div>
             </div>
             <div class="col2">
-                <div v-if="classes.length">
-                    <div v-for="cla in classes" :key="cla.id" class="class">
+                <a @click="fetchAllClassesWithAPI">Fetch all classes</a>
+                <div v-if="allClasses.length">
+                    <div v-for="cla in allClasses" :key="cla._id" class="class">
                         <p>Class {{ cla.name }}</p>
-                        <span>Created on: {{ cla.createdOn | formatDate}}</span>
+                        <span>Created on: {{ cla.created }}</span>
                         <ul>
                             <li><a @click="openStudentModal(cla)">Add Student</a></li>
                             <li><a @click="viewClass(cla)">View Student List</a></li>
@@ -153,7 +154,8 @@
                 allStudents: [],
                 gotStudent: '',
                 notification: '',
-                sid_del: ''
+                sid_del: '',
+                allClasses: []
             }
         },
         computed: {
@@ -313,6 +315,22 @@
                     this.notification = response.data
                 }).catch(error => {
                     this.notification = error.response.data
+                })
+            },
+            fetchAllClassesWithAPI () {
+                this.clearNoti()
+                api.get('/classes', { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.allClasses = response.data
+                }).catch(error => {
+                    this.notification = error.response.data
+                })
+            },
+            createClassWithAPI (name) {
+                this.clearNoti()
+                api.post('/classes', {name}, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.notification = response.data.message
+                }).catch(error => {
+                    this.notification = error.response.data.error
                 })
             }
         },
