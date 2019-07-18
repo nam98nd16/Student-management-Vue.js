@@ -6,7 +6,22 @@
                     <h5>Current User: {{ userProfile.username }}</h5>
                     <h5>Role: {{ userProfile.role }}</h5>
                     <a @click="viewAllStudentsWithAPI">View list of all students</a>
-                    <br><br><br><br><br><br><br>
+                    <div class="search-user">
+                        <p>Search for a student</p>
+                        <form @submit.prevent>
+                            <input v-model.trim="student.sid" type="text" placeholder="Enter student id" id="class1" />
+                            <button @click="searchStudentWithAPI(student.sid)" :disabled="student.sid == ''" class="button">Search</button>
+                        </form>
+                    </div>
+                    <br><br><br>
+                    <div class="delete-user">
+                        <p>Delete a student</p>
+                        <form @submit.prevent>
+                            <input v-model.trim="sid_del" type="text" placeholder="Enter student id" id="class1" />
+                            <button @click="deleteStudentWithAPI(sid_del)" :disabled="sid_del == ''" class="button">Delete</button>
+                        </form>
+                    </div>
+                    <br><br><br>
                     <div class="create-class">
                         <p>Create a new class</p>
                         <form @submit.prevent>
@@ -14,6 +29,11 @@
                             <button @click="createClass" :disabled="cla.name == ''" class="button">Create</button>
                         </form>
                     </div>
+                    <transition name="fade">
+                            <div v-if="notification !== ''" class="error-msg">
+                                <p>{{ notification }}</p>
+                            </div>
+                    </transition>
                 </div>
             </div>
             <div class="col2">
@@ -77,9 +97,23 @@
                         <a v-else>Only {{Object.keys(allStudents).length}} student</a>
                     </div>
                     <div v-show="allStudents.length" class="comments">
-                        <div v-for="student in allStudents" :key="student.id" class="comment">
+                        <div v-for="student in allStudents" :key="student._id" class="comment">
                             <p>Name: {{ student.username }}</p>
                             <p>Student ID: {{ student._id }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        <transition name="fade">
+            <div v-if="showGotStudentsModal" class="p-modal">
+                <div class="p-container">
+                    <a @click="closeGotStudentsModal" class="close">X</a>
+                    <div class="comments">
+                        <div class="comment">
+                            <p>Name: {{ gotStudent.username }}</p>
+                            <p>Student ID: {{ gotStudent._id }}</p>
+                            <p>Role: {{ gotStudent.role }}</p>
                         </div>
                     </div>
                 </div>
@@ -113,9 +147,13 @@
                 showStudentModal: false,
                 showClassModal: false,
                 showAllStudentsModal: false,
+                showGotStudentsModal: false,
                 fullClass: {},
                 studentsInClass: [],
-                allStudents: []
+                allStudents: [],
+                gotStudent: '',
+                notification: '',
+                sid_del: ''
             }
         },
         computed: {
@@ -229,9 +267,16 @@
                     console.log(err)
                 })
             },
+            clearNoti () {
+                this.notification = ''
+            },
             closeAllStudentsModal () {
                 this.allStudents = []
                 this.showAllStudentsModal = false
+            },
+            closeGotStudentsModal () {
+                this.gotStudent = ''
+                this.showGotStudentsModal = false
             },
             testGet() {
                 var docRef = fb.usersCollection.doc("CbQFcawEEPVsbi8v0QCS8dJKn1K3")
@@ -250,7 +295,24 @@
                     this.allStudents = response.data
                     this.showAllStudentsModal = true
                 }).catch(error => {
-                    console.log(error)
+                    this.notification = error.response.data
+                })
+            },
+            searchStudentWithAPI (sid) {
+                this.clearNoti()
+                api.get('/users/' + sid, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.gotStudent = response.data
+                    this.showGotStudentsModal = true
+                }).catch(error => {
+                    this.notification = error.response.data
+                })
+            },
+            deleteStudentWithAPI (sid) {
+                this.clearNoti()
+                api.delete('/users/' + sid, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.notification = response.data
+                }).catch(error => {
+                    this.notification = error.response.data
                 })
             }
         },
