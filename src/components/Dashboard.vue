@@ -51,7 +51,7 @@
                         <p>Class {{ cla.name }}</p>
                         <span>Created on: {{ cla.created }}</span>
                         <ul>
-                            <li><a @click="openStudentModal(cla._id)">Add Student</a></li>
+                            <li><a @click="openStudentModal(cla._id)">Add or remove students</a></li>
                             <li><a @click="viewAllStudentsInAClassWithAPI(cla._id)">View Student List</a></li>
                         </ul>
                         <br><br><br><br>
@@ -68,8 +68,14 @@
                     <a @click="closeStudentModal">X</a>
                     <p>Add a student to the class</p>
                     <form @submit.prevent>
-                        <input v-model.trim="sid_add" type="text" placeholder="Enter the id" />
+                        <input v-model.trim="sid_add" type="text" placeholder="Enter student id" />
                         <button @click="addStudentToAClassWithAPI(classID,sid_add)" :disabled="sid_add == ''" class="button">Add</button>
+                    </form>
+                    <br><br><br>
+                    <p>Remove a student from the class</p>
+                    <form @submit.prevent>
+                        <input v-model.trim="sid_remove" type="text" placeholder="Enter student id" />
+                        <button @click="removeAStudentFromAClassWithAPI(classID,sid_remove)" :disabled="sid_remove == ''" class="button">Remove</button>
                     </form>
                 </div>
             </div>
@@ -163,7 +169,8 @@
                 className: '',
                 cla_del: '',
                 classID: '',
-                sid_add: ''
+                sid_add: '',
+                sid_remove: ''
             }
         },
         computed: {
@@ -360,6 +367,14 @@
             addStudentToAClassWithAPI (classID, userID) {
                 this.clearNoti()
                 api.post('/classes/students', {classID, userID}, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
+                    this.notification = response.data
+                }).catch(error => {
+                    this.notification = error.response.data
+                })
+            },
+            removeAStudentFromAClassWithAPI (classID, userID) {
+                this.clearNoti()
+                api.delete('/classes/students', {data: {classID: classID, userID: userID}, 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
                     this.notification = response.data
                 }).catch(error => {
                     this.notification = error.response.data
