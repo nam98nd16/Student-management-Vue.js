@@ -25,12 +25,12 @@
                     <div class="create-class">
                         <p>Create a new class</p>
                         <form @submit.prevent>
-                            <input v-model.trim="cla.name" type="text" placeholder="Enter name of the class" id="class1" />
-                            <button @click="createClassWithAPI(cla.name)" :disabled="cla.name == ''" class="button">Create</button>
+                            <input v-model.trim="className" type="text" placeholder="Enter name of the class" id="class1" />
+                            <button @click="createClassWithAPI(className)" :disabled="className == ''" class="button">Create</button>
                         </form>
                     </div>
                     <transition name="fade">
-                            <div v-if="notification !== ''" class="error-msg">
+                            <div v-if="notification != ''" class="error-msg">
                                 <p>{{ notification }}</p>
                             </div>
                     </transition>
@@ -155,7 +155,8 @@
                 gotStudent: '',
                 notification: '',
                 sid_del: '',
-                allClasses: []
+                allClasses: [],
+                className: ''
             }
         },
         computed: {
@@ -328,9 +329,9 @@
             createClassWithAPI (name) {
                 this.clearNoti()
                 api.post('/classes', {name}, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
-                    this.notification = response.data.message
+                    this.notification = response.data
                 }).catch(error => {
-                    this.notification = error.response.data.error
+                    this.notification = error.response.data
                 })
             }
         },
