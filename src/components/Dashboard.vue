@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div v-else>
-                    <p class="no-results">Click the above button to view all classes</p>
+                    <p class="no-results">No classes fetched</p>
                 </div>
             </div>
         </section>
@@ -335,7 +335,11 @@
             fetchAllClassesWithAPI () {
                 this.clearNoti()
                 api.get('/classes', { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
-                    this.allClasses = response.data
+                    if (response.data == 'Literally no classes found') {
+                        this.allClasses = []
+                    }else{
+                        this.allClasses = response.data
+                    }
                 }).catch(error => {
                     this.notification = error.response.data
                 })
