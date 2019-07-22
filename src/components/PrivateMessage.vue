@@ -21,9 +21,9 @@
                 <div class="p-container">
                     <a @click="closeUserModal" class="close">X</a>
                     <h5>Private messages between {{userProfile.username}} and {{username}}</h5>
-                    <div v-for="message in messages[allUsers.findIndex(x => x.username == username)]" class="comments">
+                    <div v-for="message in messages" class="comments">
                         <!--<p><span style="font-weight: bold">Message:</span> {{ message.message }}, <span style="font-weight: bold">sent by:</span> <span style="font-style: italic">{{ message.user.username }}</span></p>-->
-                        <p ><span style="font-weight: bold">{{message.sender.username}}</span>: <span style="word-wrap: break-word">{{message.message}}</span> <span style="font-style:italic;float:right">{{message.time}}</span></p>
+                        <p v-if="username == message.sender.username || userProfile.username == message.sender.username"><span style="font-weight: bold">{{message.sender.username}}</span>: <span style="word-wrap: break-word">{{message.message}}</span> <span style="font-style:italic;float:right">{{message.time}}</span></p>
                     </div>
                     <form @submit.prevent="sendPrivateMessage(username)">
                         <div class="form-group pb-3">
@@ -83,9 +83,6 @@
                 api.get('/users', { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
                     this.allUsers = response.data
                     //this.showAllStudentsModal = true
-                    for (index = 0; index < this.allUsers.length; ++index) {
-                        this.messages[index] = [];
-                    }
                 }).catch(error => {
                     //this.notification = error.response.data
                 })
@@ -96,13 +93,12 @@
             },
             closeUserModal() {
                 this.showUserModal = false
-                //this.messages = []
+                this.messages = []
             }
         },
         mounted() {
             this.socket.on('new private message', (data) => {
                 this.receiver = data.sender.username
-
                 this.messages.push(data)
                 //console.log(this.items[2][1])
             })
