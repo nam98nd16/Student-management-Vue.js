@@ -2,7 +2,7 @@
   <div class="card mt-3">
       <div class="card-body">
           <div class="card-title">
-              <h3>Chat Group</h3>
+              <h3>Class ID: {{this.userProfile.class}}</h3>
               <hr>
           </div>
           <div v-for="message in messages" class="p-containter">
@@ -48,6 +48,9 @@
                 })
                 this.message = ''
             }
+        },
+        created () {
+            this.socket.emit('join class', {class: this.userProfile.class})
         },
         mounted() {
             this.socket.on('MESSAGE', (data) => {
