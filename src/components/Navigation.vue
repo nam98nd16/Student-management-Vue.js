@@ -6,7 +6,9 @@
                 <ul class="inline">
                     <li><router-link to="dashboard">Dashboard</router-link></li>
                     <li><router-link to="settings">Settings</router-link></li>
-                    <li><a @click="logoutUsingAPI">logout</a></li>
+                    <li><router-link to="chat">Group chat</router-link>
+                    <li><router-link to="message">Private message</router-link>
+                    <li><a @click="logoutUsingAPI">Logout</a></li>
                 </ul>
             </div>
         </section>

@@ -8,6 +8,8 @@ import Settings from '@/components/Settings'
 import TestApi from '../services/TestApi'
 import Test from '@/components/Test'
 import AuthApi from '../services/AuthApi'
+import Chat from '@/components/Chat'
+import PrivateMessage from '@/components/PrivateMessage'
 
 Vue.use(Router)
 
@@ -43,6 +45,22 @@ const router = new Router({
             path: '/test',
             name: 'Test',
             component: Test
+        },
+        {
+            path: '/chat',
+            name: 'Chat',
+            component: Chat,
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/message',
+            name: 'PrivateMessage',
+            component: PrivateMessage,
+            meta: {
+                requiresAuth: true
+            }
         }
     ]
 })

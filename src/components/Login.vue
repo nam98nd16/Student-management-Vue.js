@@ -143,8 +143,7 @@ const fb = require('../firebaseConfig.js')
                 //this.performingRequest = false
 
                 api.post('register', {username, password}).then(response => {
-                    if (response.data.message == 'Successfully signed up!') {
-
+                    if (response.data.message == 'Successfully signed up') {
                         this.toggleForm()
                     }
                 }).catch(error => {

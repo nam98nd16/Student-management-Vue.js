@@ -7,31 +7,31 @@
                     <h5>Role: {{ userProfile.role }}</h5>
                     <a @click="viewAllStudentsWithAPI">View list of all students</a>
                     <div class="search-user">
-                        <p>Search for a student</p>
+                        <p style="font-style:italic">Search for a student</p>
                         <form @submit.prevent>
                             <input v-model.trim="student.sid" type="text" placeholder="Enter student id" id="class1" />
                             <button @click="searchStudentWithAPI(student.sid)" :disabled="student.sid == ''" class="button">Search</button>
                         </form>
                     </div>
-                    <br><br><br>
+                    <br><br>
                     <div class="delete-user">
-                        <p>Delete a student</p>
+                        <p style="font-style:italic">Delete a student</p>
                         <form @submit.prevent>
                             <input v-model.trim="sid_del" type="text" placeholder="Enter student id" id="class2" />
                             <button @click="deleteStudentWithAPI(sid_del)" :disabled="sid_del == ''" class="button">Delete</button>
                         </form>
                     </div>
-                    <br><br><br>
+                    <br><br>
                     <div class="create-class">
-                        <p>Create a new class</p>
+                        <p style="font-style:italic">Create a new class</p>
                         <form @submit.prevent>
                             <input v-model.trim="className" type="text" placeholder="Enter name of the class" id="class3" />
                             <button @click="createClassWithAPI(className)" :disabled="className == ''" class="button">Create</button>
                         </form>
                     </div>
-                    <br><br><br>
+                    <br><br>
                     <div class="delete-class">
-                        <p>Delete a class</p>
+                        <p style="font-style:italic">Delete a class</p>
                         <form @submit.prevent>
                             <input v-model.trim="cla_del" type="text" placeholder="Enter name of the class" id="class4" />
                             <button @click="deleteClassWithAPI(cla_del)" :disabled="cla_del == ''" class="button">Delete</button>
@@ -125,6 +125,7 @@
                             <p>Name: {{ gotStudent.username }}</p>
                             <p>Student ID: {{ gotStudent._id }}</p>
                             <p>Role: {{ gotStudent.role }}</p>
+                            <p>Description: {{ gotStudent.description }}</p>
                         </div>
                     </div>
                 </div>

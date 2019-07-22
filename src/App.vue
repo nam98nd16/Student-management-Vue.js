@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <Navigation v-if='currentUser'></Navigation>
-    <router-view/>
+    <keep-alive include="chat">
+      <router-view/>
+    </keep-alive>
   </div>
 </template>
 
