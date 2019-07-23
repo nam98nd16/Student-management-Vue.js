@@ -111,7 +111,7 @@
                         <div v-for="student in allStudents" :key="student._id" class="comment">
                             <p>Name: {{ student.username }}</p>
                             <p>Student ID: {{ student._id }}</p>
-                            <button @click="deleteStudentWithAPI(student._id)" :disabled="student._id == ''" class="button">Delete</button>
+                            <button @click="openConfirmModal(student._id)" :disabled="student._id == ''" class="button">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -129,6 +129,17 @@
                             <p>Description: {{ gotStudent.description }}</p>
                             <p>Class ID: {{ gotStudent.class }}</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        <transition name="fade">
+            <div v-if="showConfirmModal" class="c-modal">
+                <div class="c-container">
+                    <a @click="closeConfirmModal">X</a>
+                    <p style="text-align: center">Are you sure you want to delete this student?</p>
+                    <div style="text-align: center">
+                        <button @click="deleteStudentWithAPI(sid_del)" :disabled="sid_del == ''" class="button">YES</button>
                     </div>
                 </div>
             </div>
@@ -162,6 +173,7 @@
                 showClassModal: false,
                 showAllStudentsModal: false,
                 showGotStudentsModal: false,
+                showConfirmModal: false,
                 fullClass: {},
                 studentsInClass: [],
                 allStudents: [],
@@ -331,6 +343,8 @@
                 this.clearNoti()
                 api.delete('/users/' + sid, { 'headers': { 'Authorization': this.$cookie.get('token')}}).then(response => {
                     this.notification = response.data
+                    this.closeConfirmModal()
+                    this.viewAllStudentsWithAPI()
                 }).catch(error => {
                     this.notification = error.response.data
                 })
@@ -386,6 +400,14 @@
                 }).catch(error => {
                     this.notification = error.response.data
                 })
+            },
+            openConfirmModal (sid) {
+                this.sid_del = sid
+                this.showConfirmModal = true
+            },
+            closeConfirmModal () {
+                this.sid_del = '',
+                this.showConfirmModal = false
             }
         },
         filters: {
