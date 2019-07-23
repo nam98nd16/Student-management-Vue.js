@@ -14,14 +14,14 @@
                         </form>
                     </div>
                     <br><br>
-                    <div class="delete-user">
+                    <!--<div class="delete-user">
                         <p style="font-style:italic">Delete a student</p>
                         <form @submit.prevent>
                             <input v-model.trim="sid_del" type="text" placeholder="Enter student id" id="class2" />
                             <button @click="deleteStudentWithAPI(sid_del)" :disabled="sid_del == ''" class="button">Delete</button>
                         </form>
                     </div>
-                    <br><br>
+                    <br><br>-->
                     <div class="create-class">
                         <p style="font-style:italic">Create a new class</p>
                         <form @submit.prevent>
@@ -111,6 +111,7 @@
                         <div v-for="student in allStudents" :key="student._id" class="comment">
                             <p>Name: {{ student.username }}</p>
                             <p>Student ID: {{ student._id }}</p>
+                            <button @click="deleteStudentWithAPI(student._id)" :disabled="student._id == ''" class="button">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -126,6 +127,7 @@
                             <p>Student ID: {{ gotStudent._id }}</p>
                             <p>Role: {{ gotStudent.role }}</p>
                             <p>Description: {{ gotStudent.description }}</p>
+                            <p>Class ID: {{ gotStudent.class }}</p>
                         </div>
                     </div>
                 </div>
